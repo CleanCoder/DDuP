@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: echo
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-app
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app-pod
+  namespace: my-app
+spec:
+  containers:
+  - image: nginx
+    name: my-app-pod
+    ports:
+    - containerPort: 9000
+      protocol: TCP
+    resources:
+      requests:
+        cpu: 20m
+        memory: 10Mi
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: echo-pod
+  namespace: echo
+spec:
+  containers:
+  - image: nginx
+    name: echo-pod
+    resources:
+      requests:
+        cpu: 20m
+        memory: 10Mi
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always

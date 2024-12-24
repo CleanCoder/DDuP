@@ -1,0 +1,20 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: quickstart2
+spec:
+  version: 8.11.1
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false
+  # http:
+  #   service:
+  #     spec:
+  #       type: NodePort
+  #       ports:
+  #         - protocol: TCP
+  #           port: 9200 
+  #           targetPort: 9200
+  #           nodePort: 31920

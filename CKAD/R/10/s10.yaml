@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: c10
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: honeybee-deployment
+  namespace: c10
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: honeybee
+  template:
+    metadata:
+      labels:
+        app: honeybee
+    spec:
+      containers:
+      - name: honeybee
+        image: bitnami/kubectl:latest # 使用带 kubectl 工具的镜像
+        command:
+        - /bin/sh
+        - -c
+        - >
+          while true; do
+            kubectl get serviceaccounts;
+            sleep 10;
+          done
+      serviceAccountName: default2
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: c10
+  name: boxweb-role
+rules:
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: c10
+  name: gorilla-role
+rules:
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["list", "get"]
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: boxweb-sa
+  namespace: c10
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gorilla-sa
+  namespace: c10
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default2
+  namespace: c10
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: boxweb-rolebinding
+  namespace: c10
+subjects:
+- kind: ServiceAccount
+  name: boxweb-sa
+  namespace: c10
+roleRef:
+  kind: Role
+  name: boxweb-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gorilla-rolebinding
+  namespace: c10
+subjects:
+- kind: ServiceAccount
+  name: gorilla-sa
+  namespace: c10
+roleRef:
+  kind: Role
+  name: gorilla-role
+  apiGroup: rbac.authorization.k8s.io

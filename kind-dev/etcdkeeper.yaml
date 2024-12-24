@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcdkeeper
+  labels:
+    app: etcdkeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etcdkeeper
+  template:
+    metadata:
+      labels:
+        app: etcdkeeper
+    spec:
+      containers:
+      - name: etcdkeeper
+        image: evildecay/etcdkeeper:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: LISTEN_PORT
+          value: "8080"
+        - name: ETCD_HOST
+          value: "etcd-service.kube-system.svc.cluster.local" # Replace with the correct ETCD service name or IP
+        - name: ETCD_PORT
+          value: "2379"
+        - name: cacert
+          value: "/etc/kubernetes/pki/etcd/server.crt"
+        - name: cert
+          value: "/etc/kubernetes/pki/etcd/server.crt"
+        - name: key
+          value: "/etc/kubernetes/pki/etcd/server.key"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcdkeeper
+spec:
+  selector:
+    app: etcdkeeper
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

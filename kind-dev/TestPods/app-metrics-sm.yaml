@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app-metrics-sm
+  labels:
+    release: monitoring  # need match to prmetheus:spec:serviceMonitorSelector:matchLabels
+spec:
+  selector:
+    matchLabels:
+      app: app-metrics
+  namespaceSelector:
+    any: true
+    # matchNames:
+    #   - dev
+  endpoints:
+  - port: web
+    path: "/metrics"
+    interval: "30s"
+
+

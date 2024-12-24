@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-metrics
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-metrics
+  template:
+    metadata:
+      labels:
+        app: app-metrics
+      annotations:
+        prometheus.io/scrape: "true"
+        # prometheus.io/scheme: "http"
+        # prometheus.io/path: "metrics" 
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+      - name: app-metrics
+        image: fabxc/instrumented_app
+        ports:
+        - name: web
+          containerPort: 8080
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: app-metrics
+  labels:
+    app: app-metrics
+spec:
+  selector:
+    app: app-metrics
+  ports:
+  - name: web
+    port: 8080

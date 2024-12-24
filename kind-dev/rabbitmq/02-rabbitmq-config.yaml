@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+data:
+  enabled_plugins: |
+    [rabbitmq_federation,rabbitmq_management,rabbitmq_peer_discovery_k8s].
+  rabbitmq.conf: |
+    ## Clustering
+    #cluster_formation.peer_discovery_backend = k8s
+    #cluster_formation.peer_discovery_backend = rabbit_peer_discovery_k8s
+    #cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
+    #cluster_formation.k8s.address_type = hostname
+    #cluster_formation.k8s.service_name = rabbitmq-headless
+    #cluster_partition_handling = autoheal
+ 
+    #cluster_formation.k8s.hostname_suffix = rabbitmq.${NAMESPACE}.svc.cluster.local
+    #cluster_formation.node_cleanup.interval = 10
+    #cluster_formation.node_cleanup.only_log_warning = true
+     
+    ## queue master locator
+    queue_master_locator=min-masters
+    loopback_users.guest = false
+ 
+    #auth_mechanisms.1 = PLAIN
+    #auth_mechanisms.2 = AMQPLAIN
+ 
+    ## set max memory available to MQ
+    #vm_memory_high_watermark.absolute = 1GB
+    vm_memory_high_watermark.absolute = 900MB
+    ## load definitions file
+    management.load_definitions = /etc/rabbitmq/definitions.json
+ 
+    management.path_prefix = /mqadmin
+  definitions.json: |-
+    {
+      "users": [
+          { "name": "admin", "password": "admin","tags": "administrator"},
+          { "name": "dev","password": "dev", "tags": "administrator" }
+      ],
+      "vhosts":[
+          {"name":"/"},
+          {"name": "users","tracing": false,"tags": "management"}
+      ],
+      "permissions": [
+        {"user": "dev","vhost": "/","configure": ".*","write": ".*","read": ".*"},
+        {"user": "dev","vhost": "users","configure": ".*","write": ".*","read": ".*"},
+        {"user": "admin","vhost": "/","configure": ".*", "write": ".*","read": ".*"}
+      ],
+       "policies":[
+          {"vhost":"users","name":"ha","pattern":"", "definition":{"ha-mode":"all","ha-sync-mode":"automatic"}}
+      ],
+      "queues":[
+        {"name":"testQ", "vhost":"users", "durable":true, "auto_delete":false, "arguments":{}},
+         {"name":"testQ333", "vhost":"users", "durable":true, "auto_delete":false, "arguments":{}},
+        {"name":"q.user.created", "vhost":"/", "durable":true,"auto_delete":true, "arguments":{}}
+      ],
+      "exchanges":[
+        {"name":"e.user.created", "vhost":"/", "type":"topic", "durable":true, "auto_delete":false, "internal":false, "arguments":{}}
+      ],
+      "bindings":[
+        {"source":"e.user.created", "vhost":"/","destination":"q.user.created","destination_type":"queue","routing_key":"user.created","arguments":{}}
+      ]
+    }

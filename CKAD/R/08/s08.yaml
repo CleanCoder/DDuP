@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: c08
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: broker-deployment
+  name: broker-deployment
+  namespace: c08
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broker-deployment
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: broker-deployment
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}

@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: c05
+spec: {}
+status: {}
+
+# ---
+# apiVersion: v1
+# kind: ResourceQuota
+# metadata:
+#   name: memory-quota
+#   namespace: c05
+# spec:
+#   hard:
+#     memory: "40Mi"  # Set the max memory limit for the entire namespace
+
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: memory-limit-range
+  namespace: c05
+spec:
+  limits:
+  - type: Container
+    max:
+      memory: "40Mi"  # Maximum memory a container can use  
+    default:
+      memory: "16Mi"  # Default memory request for containers without an explicit value  
+    defaultRequest:
+      memory: "8Mi"  # Default memory request for containers without an explicit value  
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nosql 
+  name: nosql 
+  namespace: c05
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nosql 
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: nosql
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources:
+          requests:
+            cpu: 50m
+            memory: 200Mi

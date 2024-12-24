@@ -1,0 +1,69 @@
+kubeApiServer:
+  enabled: false
+kubelet:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+coreDns:
+  enabled: false
+kubeDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeStateMetrics:
+  enabled: false
+nodeExporter:
+  enabled: false
+
+kube-state-metrics:
+  prometheus:
+    monitor:
+      enabled: false
+prometheus-node-exporter:
+  prometheus:
+    monitor:
+      enabled: false
+
+alertmanager:
+  enabled: true
+  service:
+    port: 9093
+    targetPort: 9093
+    nodePort: 30903
+    type: NodePort
+grafana:
+  enabled: true
+  adminPassword: admin
+  service:
+    portName: http-web
+    port: 3000
+    targetPort: 3000
+    nodePort: 32000
+    type: NodePort
+
+  # serviceMonitor:
+  #   enabled: true
+  #   # Path to use for scraping metrics. Might be different if server.root_url is set  in grafana.ini
+  #   path: "/metrics"
+  #   interval: ""
+  #   scheme: http
+  #   tlsConfig: {}
+  #   scrapeTimeout: 30s
+prometheus:
+  enabled: true
+  service:
+    port: 9090
+    targetPort: 9090
+    nodePort: 32080
+    type: NodePort
+  prometheusSpec:
+    enableAdminAPI: true
+    serviceMonitorNamespaceSelector: {}
+    serviceMonitorSelector:
+      matchLabels:
+        release: monitoring
+ 

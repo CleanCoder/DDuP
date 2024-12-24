@@ -1,0 +1,71 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elk
+spec:
+  version: 8.11.1
+  nodeSets:
+  - name: default
+    count: 1
+    # volumeClaimTemplates:
+    # - metadata:
+    #     name: elasticsearch-data # Do not change this name unless you set up a volume mount for the data path.
+    #   spec:
+    #     accessModes:
+    #     - ReadWriteOnce
+    #     resources:
+    #       requests:
+    #         storage: 5Gi
+    config:
+      node.store.allow_mmap: false
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: es
+spec:
+  type: NodePort
+  selector:
+    common.k8s.elastic.co/type: elasticsearch
+    elasticsearch.k8s.elastic.co/cluster-name: elk
+  ports:
+    - protocol: TCP
+      port: 9200
+      targetPort: 9200
+      nodePort: 31920
+
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: elk
+spec:
+  version: 8.11.1
+  count: 1
+  elasticsearchRef:
+    name: elk
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+spec:
+  type: NodePort
+  selector:
+    common.k8s.elastic.co/type: kibana
+    kibana.k8s.elastic.co/name: elk
+  ports:
+    - protocol: TCP
+      port: 5601
+      targetPort: 5601
+      nodePort: 31601
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: elk-es-elastic-user
+data:
+  elastic: ZWxhc3RpYw==

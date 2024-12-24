@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: c19
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+  name: nginx-dm
+  namespace: c19
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ing-svc
+  namespace: c19
+spec:
+  selector:
+    app: nginx-test
+  ports:
+    - protocol: TCP
+      port: 80        # Service port
+      targetPort: 80  # Target port exposed by the container
+  type: ClusterIP     # Change to NodePort or LoadBalancer as per your requirement
