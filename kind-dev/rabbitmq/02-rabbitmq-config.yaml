@@ -36,7 +36,9 @@ data:
     {
       "users": [
           { "name": "admin", "password": "admin","tags": "administrator"},
-          { "name": "dev","password": "dev", "tags": "administrator" }
+          { "name": "dev","password": "dev", "tags": "administrator" },
+          { "name": "users","password": "users", "tags": "administrator" },
+          { "name": "guest","password": "guest", "tags": "administrator" }
       ],
       "vhosts":[
           {"name":"/"},
@@ -45,6 +47,10 @@ data:
       "permissions": [
         {"user": "dev","vhost": "/","configure": ".*","write": ".*","read": ".*"},
         {"user": "dev","vhost": "users","configure": ".*","write": ".*","read": ".*"},
+        {"user": "users","vhost": "/","configure": ".*","write": ".*","read": ".*"},
+        {"user": "users","vhost": "users","configure": ".*","write": ".*","read": ".*"},
+        {"user": "guest","vhost": "/","configure": ".*","write": ".*","read": ".*"},
+        {"user": "guest","vhost": "users","configure": ".*","write": ".*","read": ".*"},
         {"user": "admin","vhost": "/","configure": ".*", "write": ".*","read": ".*"}
       ],
        "policies":[
@@ -52,7 +58,7 @@ data:
       ],
       "queues":[
         {"name":"testQ", "vhost":"users", "durable":true, "auto_delete":false, "arguments":{}},
-         {"name":"testQ333", "vhost":"users", "durable":true, "auto_delete":false, "arguments":{}},
+        {"name":"testQ333", "vhost":"users", "durable":true, "auto_delete":false, "arguments":{}},
         {"name":"q.user.created", "vhost":"/", "durable":true,"auto_delete":true, "arguments":{}}
       ],
       "exchanges":[

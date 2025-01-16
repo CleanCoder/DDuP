@@ -17,6 +17,10 @@ kind get clusters
 ## Nginx Ingress
 
 ```bash
+k label node dev-control-plane ingress-ready=true
+k label node dev-worker ingress-ready=true
+k label node dev-worker2 ingress-ready=true
+
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
 kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=90s
